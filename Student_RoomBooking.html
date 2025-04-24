@@ -1,302 +1,307 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UOW Room Booking System</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-      background-color: #f0f4f8;
-    }
-    .container {
-      max-width: 500px;
-      margin: 50px auto;
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-    h1, h2 {
-      color: #000000;
-    }
-    input, button, select {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    button {
-      background-color: #3b82f6;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #2563eb;
-    }
-    a {
-      color: #3b82f6;
-      text-decoration: underline;
-    }
-    .logo {
-      width: 140px;
-      margin-bottom: 20px;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <img src="https://cef.org.au/wp-content/uploads/2021/10/UoW-logo.png" alt="UOW Logo" class="logo">
-    <div id="app"></div>
-  </div>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>UOW Room Booking System (Student)</title>
+        <style>
 
-  <script>
-    const app = document.getElementById('app');
-    let route = window.location.hash;
-    const users = [];
-    const bookings = [];
+            body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            background-color: #f0f4f8;
+            }
+            .container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+            h1, h2 {
+            color: #000000;
+            }
+            input, button, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            }
+            button {
+            background-color: #3b82f6;
+            color: white;
+            cursor: pointer;
+            }
+            button:hover {
+            background-color: #2563eb;
+            }
+            a {
+            color: #3b82f6;
+            text-decoration: underline;
+            }
+            .logo {
+            width: 140px;
+            margin-bottom: 20px;
+            }
 
-    function navigate(route) {
-      window.location.hash = route;
-      render(route);
-    }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <img src="https://cef.org.au/wp-content/uploads/2021/10/UoW-logo.png" alt="UOW Logo" class="logo">
+            <div id="app"></div>
+        </div>
 
-    function render(route) {
-      switch(route) {
-        case '#signup':
-          app.innerHTML = `
-            <h2>Sign Up</h2>
-            <input type="text" id="firstName" placeholder="First Name">
-            <input type="text" id="lastName" placeholder="Last Name">
-            <input type="email" id="email" placeholder="UOW Email">
-            <input type="password" id="password" placeholder="Password">
-            <input type="password" id="confirm" placeholder="Re-enter Password">
-            <input list="nationalities" id="nationality" placeholder="Nationality">
-            <datalist id="nationalities">
-              <option value="Afghan">
-              <option value="Albanian">
-              <option value="Algerian">
-              <option value="American">
-              <option value="Andorran">
-              <option value="Angolan">
-              <option value="Argentine">
-              <option value="Armenian">
-              <option value="Australian">
-              <option value="Austrian">
-              <option value="Azerbaijani">
-              <option value="Bangladeshi">
-              <option value="Belgian">
-              <option value="Brazilian">
-              <option value="British">
-              <option value="Canadian">
-              <option value="Chinese">
-              <option value="Colombian">
-              <option value="Croatian">
-              <option value="Czech">
-              <option value="Danish">
-              <option value="Dutch">
-              <option value="Egyptian">
-              <option value="English">
-              <option value="Finnish">
-              <option value="French">
-              <option value="German">
-              <option value="Greek">
-              <option value="Hungarian">
-              <option value="Indian">
-              <option value="Indonesian">
-              <option value="Irish">
-              <option value="Israeli">
-              <option value="Italian">
-              <option value="Japanese">
-              <option value="Kenyan">
-              <option value="Malaysian">
-              <option value="Mexican">
-              <option value="Nepalese">
-              <option value="New Zealander">
-              <option value="Nigerian">
-              <option value="Norwegian">
-              <option value="Pakistani">
-              <option value="Peruvian">
-              <option value="Philippine">
-              <option value="Polish">
-              <option value="Portuguese">
-              <option value="Romanian">
-              <option value="Russian">
-              <option value="Saudi">
-              <option value="Scottish">
-              <option value="Singaporean">
-              <option value="South African">
-              <option value="South Korean">
-              <option value="Spanish">
-              <option value="Sri Lankan">
-              <option value="Swedish">
-              <option value="Swiss">
-              <option value="Taiwanese">
-              <option value="Thai">
-              <option value="Turkish">
-              <option value="Ukrainian">
-              <option value="Vietnamese">
-              <option value="Welsh">
-              <option value="Zimbabwean">
-              <option value="Other">
-            </datalist>
-            <label for="dob" style="display:block; text-align:left; font-size:14px; margin-top:10px;">Date of Birth (dd/mm/yyyy)</label>
-            <input type="date" id="dob" placeholder="Date of Birth">
-            <button onclick="signup()">Sign Up</button>
-            <p><a href="#home" onclick="navigate('#home')">Back</a></p>
-          `;
-          break;
-        case '#login':
-          app.innerHTML = `
-            <h2>Login</h2>
-            <input type="email" id="email" placeholder="Email">
-            <input type="password" id="password" placeholder="Password">
-            <button onclick="login()">Login</button>
-            <p><a href="#forgot" onclick="navigate('#forgot')">Forgot Password?</a></p>
-            <p><a href="#home" onclick="navigate('#home')">Back</a></p>
-          `;
-          break;
-        case '#forgot':
-          app.innerHTML = `
-            <h2>Forgot Password</h2>
-            <input type="email" id="fp-email" placeholder="Enter your UOW email">
-            <input type="text" id="fp-key" placeholder="Enter your 10-digit password key">
-            <button onclick="verifyPasswordKey()">Show Password</button>
-            <p><a href="#login" onclick="navigate('#login')">Back to Login</a></p>
-          `;
-          break;
-        case '#dashboard':
-          const today = new Date().toISOString().split('T')[0];
-          app.innerHTML = `
-            <h2>Dashboard</h2>
-            <p>Welcome to the dashboard.</p>
-            <button onclick="navigate('#home')">Log out</button>
-            <h3>Book a Room</h3>
-            <select id="booking-room" onchange="updateAvailableTimes()">
-              <option value="Room A101">Room A101</option>
-              <option value="Room A102">Room A102</option>
-              <option value="Room B201">Room B201</option>
-              <option value="Room B202">Room B202</option>
-              <option value="Room C301">Room C301</option>
-              <option value="Room C302">Room C302</option>
-              <option value="Room D401">Room D401</option>
-              <option value="Room D402">Room D402</option>
-              <option value="Room E501">Room E501</option>
-              <option value="Room E502">Room E502</option>
-            </select>
-            <input type="date" id="booking-date" min="${today}" onchange="updateAvailableTimes()">
-            <select id="booking-time">
-              <option value="08:00">08:00</option>
-              <option value="09:00">09:00</option>
-              <option value="10:00">10:00</option>
-              <option value="11:00">11:00</option>
-              <option value="12:00">12:00</option>
-              <option value="13:00">13:00</option>
-              <option value="14:00">14:00</option>
-              <option value="15:00">15:00</option>
-              <option value="16:00">16:00</option>
-              <option value="17:00">17:00</option>
-              <option value="18:00">18:00</option>
-            </select>
-                        <button onclick="bookRoom()">Book</button>
-            <div id="bookings-list"></div>
-          `;
-          updateAvailableTimes();
-          showBookings();
-          break;
-        case '#home':
-        default:
-          app.innerHTML = `
-            <h1>UOW Room Booking System</h1>
-            <a href="#login" onclick="navigate('#login')">Login</a><br><br>
-            <a href="#signup" onclick="navigate('#signup')">Sign Up</a>
-          `;
-      }
-    }
+        <script>
+        
+            const app = document.getElementById('app');
+            let route = window.location.hash;
+            const users = [];
+            const bookings = [];
 
-    function signup() {
-      const firstName = document.getElementById('firstName').value.trim();
-      const lastName = document.getElementById('lastName').value.trim();
-      const nationality = document.getElementById('nationality').value.trim();
-      const dob = document.getElementById('dob').value;
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      const confirm = document.getElementById('confirm').value;
-      const emailRegex = /^[\w-.]+@uowmail\.edu\.au$/;
-      const passRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
-      if (!emailRegex.test(email)) return alert('Please enter a valid uow email.');
-      if (!passRegex.test(password)) return alert('Password must be at least 8 characters with uppercase letters and special characters.');
-      if (password !== confirm) return alert('Passwords do not match.');
-      const passwordKey = Math.floor(1000000000 + Math.random() * 9000000000).toString();
-      users.push({ name: firstName + ' ' + lastName, email, password, nationality, dob, passwordKey });
-      alert(`Sign up successful.\nYour password key is: ${passwordKey}\nPlease memorize or take a screenshot.`);
-      navigate('#login');
-    }
+            function navigate(route) {
+                window.location.hash = route;
+                render(route);
+            }
 
-    function login() {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      const user = users.find(u => u.email === email && u.password === password);
-      if (user) {
-        alert(`Welcome ${user.name}!`);
-        navigate('#dashboard');
-      } else alert('Invalid email or password.');
-    }
+            function render(route) {
+                switch(route) {
+                    case '#login':
+                        app.innerHTML = `
+                            <h2>Login</h2>
+                            <input type="email" id="email" placeholder="Email">
+                            <input type="password" id="password" placeholder="Password">
+                            <button onclick="login()">Login</button>
+                            <p><a href="#forgot" onclick="navigate('#forgot')">Forgot Password?</a></p>
+                            <p><a href="#home" onclick="navigate('#home')">Back</a></p>
+                        `;
+                        break;
+                    case '#signup':
+                        app.innerHTML = `
+                            <h2>Sign Up</h2>
+                            <input type="text" id="firstName" placeholder="First Name">
+                            <input type="text" id="lastName" placeholder="Last Name">
+                            <input type="email" id="email" placeholder="UOW Email">
+                            <input type="password" id="password" placeholder="Password">
+                            <input type="password" id="confirm" placeholder="Re-enter Password">
+                            <input list="nationalities" id="nationality" placeholder="Nationality">
+                            <datalist id="nationalities">
+                                <option value="Afghan">
+                                <option value="Albanian">
+                                <option value="Algerian">
+                                <option value="American">
+                                <option value="Andorran">
+                                <option value="Angolan">
+                                <option value="Argentine">
+                                <option value="Armenian">
+                                <option value="Australian">
+                                <option value="Austrian">
+                                <option value="Azerbaijani">
+                                <option value="Bangladeshi">
+                                <option value="Belgian">
+                                <option value="Brazilian">
+                                <option value="British">
+                                <option value="Canadian">
+                                <option value="Chinese">
+                                <option value="Colombian">
+                                <option value="Croatian">
+                                <option value="Czech">
+                                <option value="Danish">
+                                <option value="Dutch">
+                                <option value="Egyptian">
+                                <option value="English">
+                                <option value="Finnish">
+                                <option value="French">
+                                <option value="German">
+                                <option value="Greek">
+                                <option value="Hungarian">
+                                <option value="Indian">
+                                <option value="Indonesian">
+                                <option value="Irish">
+                                <option value="Israeli">
+                                <option value="Italian">
+                                <option value="Japanese">
+                                <option value="Kenyan">
+                                <option value="Malaysian">
+                                <option value="Mexican">
+                                <option value="Nepalese">
+                                <option value="New Zealander">
+                                <option value="Nigerian">
+                                <option value="Norwegian">
+                                <option value="Pakistani">
+                                <option value="Peruvian">
+                                <option value="Philippine">
+                                <option value="Polish">
+                                <option value="Portuguese">
+                                <option value="Romanian">
+                                <option value="Russian">
+                                <option value="Saudi">
+                                <option value="Scottish">
+                                <option value="Singaporean">
+                                <option value="South African">
+                                <option value="South Korean">
+                                <option value="Spanish">
+                                <option value="Sri Lankan">
+                                <option value="Swedish">
+                                <option value="Swiss">
+                                <option value="Taiwanese">
+                                <option value="Thai">
+                                <option value="Turkish">
+                                <option value="Ukrainian">
+                                <option value="Vietnamese">
+                                <option value="Welsh">
+                                <option value="Zimbabwean">
+                                <option value="Other">
+                            </datalist>
+                            <label for="dob" style="display:block; text-align:left; font-size:14px; margin-top:10px;">Date of Birth (dd/mm/yyyy)</label>
+                            <input type="date" id="dob" placeholder="Date of Birth">
+                            <button onclick="signup()">Sign Up</button>
+                            <p><a href="#home" onclick="navigate('#home')">Back</a></p>
+                        `;
+                        break;
+                    case '#forgot':
+                        app.innerHTML = `
+                            <h2>Forgot Password</h2>
+                            <input type="email" id="fp-email" placeholder="Enter your UOW email">
+                            <input type="text" id="fp-key" placeholder="Enter your 10-digit password key">
+                            <button onclick="verifyPasswordKey()">Show Password</button>
+                            <p><a href="#login" onclick="navigate('#login')">Back to Login</a></p>
+                        `;
+                        break;
+                    case '#dashboard':
+                        const today = new Date().toISOString().split('T')[0];
+                        app.innerHTML = `
+                            <h2>Dashboard</h2>
+                            <p>Welcome to the dashboard.</p>
+                            <button onclick="navigate('#home')">Log out</button>
+                            <h3>Book a Room</h3>
+                            <select id="booking-room" onchange="updateAvailableTimes()">
+                                <option value="Room A101">Room A101</option>
+                                <option value="Room A102">Room A102</option>
+                                <option value="Room B201">Room B201</option>
+                                <option value="Room B202">Room B202</option>
+                                <option value="Room C301">Room C301</option>
+                                <option value="Room C302">Room C302</option>
+                                <option value="Room D401">Room D401</option>
+                                <option value="Room D402">Room D402</option>
+                                <option value="Room E501">Room E501</option>
+                                <option value="Room E502">Room E502</option>
+                            </select>
+                            <input type="date" id="booking-date" min="${today}" onchange="updateAvailableTimes()">
+                            <select id="booking-time">
+                                <option value="08:00">08:00</option>
+                                <option value="09:00">09:00</option>
+                                <option value="10:00">10:00</option>
+                                <option value="11:00">11:00</option>
+                                <option value="12:00">12:00</option>
+                                <option value="13:00">13:00</option>
+                                <option value="14:00">14:00</option>
+                                <option value="15:00">15:00</option>
+                                <option value="16:00">16:00</option>
+                                <option value="17:00">17:00</option>
+                                <option value="18:00">18:00</option>
+                            </select>
+                            
+                            <button onclick="bookRoom()">Book</button>
+                            <div id="bookings-list"></div>
+                        `;
+                        updateAvailableTimes();
+                        showBookings();
+                        break;
+                    case '#home':
+                        default:
+                            app.innerHTML = `
+                                <h1>UOW Room Booking System (Student)</h1>
+                                <button onclick="navigate('#login')" style="width: auto;">Login</button><br>
+                                <button onclick="navigate('#signup')" style="width: auto;">Sign Up</button>
+                            `;
+                }
+            }
 
-    function verifyPasswordKey() {
-      const email = document.getElementById('fp-email').value.trim();
-      const key = document.getElementById('fp-key').value.trim();
-      const user = users.find(u => u.email === email && u.passwordKey === key);
-      if (user) {
-        alert(`Your password is: ${user.password}`);
-        navigate('#login');
-      } else alert('Invalid password key or email.');
-    }
+            function signup() {
+                const firstName = document.getElementById('firstName').value.trim();
+                const lastName = document.getElementById('lastName').value.trim();
+                const nationality = document.getElementById('nationality').value.trim();
+                const dob = document.getElementById('dob').value;
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const confirm = document.getElementById('confirm').value;
+                const emailRegex = /^[\w-.]+@uowmail\.edu\.au$/;
+                const passRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+                if (!emailRegex.test(email)) return alert('Please enter a valid uow email.');
+                if (!passRegex.test(password)) return alert('Password must be at least 8 characters with uppercase letters and special characters.');
+                if (password !== confirm) return alert('Passwords do not match.');
+                const passwordKey = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+                users.push({ name: firstName + ' ' + lastName, email, password, nationality, dob, passwordKey });
+                alert(`Sign up successful.\nYour password key is: ${passwordKey}\nPlease memorize or take a screenshot.`);
+                navigate('#login');
+            }
 
-    function bookRoom() {
-      const date = document.getElementById('booking-date').value;
-      const time = document.getElementById('booking-time').value;
-      const room = document.getElementById('booking-room').value;
-            if (!date || !time || !room) return alert('Please complete all booking fields.');
-            const conflict = bookings.find(b => b.date === date && b.time === time && b.room === room);
-      if (conflict) return;
-      bookings.push({ date, time, room });
-      alert(`Room booked on ${date} at ${time} for ${room}`);
-      updateAvailableTimes();
-      showBookings();
-    }
+            function login() {
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const user = users.find(u => u.email === email && u.password === password);
+                if (user) {
+                    alert(`Welcome ${user.name}!`);
+                    navigate('#dashboard');
+                } else alert('Invalid email or password.');
+            }
 
-    function showBookings() {
-      const list = document.getElementById('bookings-list');
-      list.innerHTML = '<h4>Current Bookings:</h4>' + bookings.map(b => `<p>${b.date} @ ${b.time} - ${b.room}</p>`).join('');
-    }
+            function verifyPasswordKey() {
+                const email = document.getElementById('fp-email').value.trim();
+                const key = document.getElementById('fp-key').value.trim();
+                const user = users.find(u => u.email === email && u.passwordKey === key);
+                if (user) {
+                    alert(`Your password is: ${user.password}`);
+                    navigate('#login');
+                } else alert('Invalid password key or email.');
+            }
 
-    function updateAvailableTimes() {
-      const timeSelect = document.getElementById('booking-time');
-      const date = document.getElementById('booking-date')?.value;
-      const room = document.getElementById('booking-room')?.value;
-      if (!date || !room) return;
-      const bookedTimes = bookings.filter(b => b.date === date && b.room === room).map(b => b.time);
-      [...timeSelect.options].forEach(opt => {
-        if (bookedTimes.includes(opt.value)) {
-          opt.disabled = true;
-          opt.style.textDecoration = 'line-through';
-          opt.style.color = '#999';
-        } else {
-          opt.disabled = false;
-          opt.style.textDecoration = 'none';
-          opt.style.color = '';
-        }
-      });
-    }
+            function bookRoom() {
+                const date = document.getElementById('booking-date').value;
+                const time = document.getElementById('booking-time').value;
+                const room = document.getElementById('booking-room').value;
+                        if (!date || !time || !room) return alert('Please complete all booking fields.');
+                        const conflict = bookings.find(b => b.date === date && b.time === time && b.room === room);
+                if (conflict) return;
+                bookings.push({ date, time, room });
+                alert(`Room booked on ${date} at ${time} for ${room}`);
+                updateAvailableTimes();
+                showBookings();
+            }
 
-    window.addEventListener('hashchange', () => render(window.location.hash));
-    render(route);
-    if (!window.location.hash) navigate('#home');
-  </script>
-</body>
+            function showBookings() {
+                const list = document.getElementById('bookings-list');
+                list.innerHTML = '<h4>Current Bookings:</h4>' + bookings.map(b => `<p>${b.date} @ ${b.time} - ${b.room}</p>`).join('');
+            }
+
+            function updateAvailableTimes() {
+                const timeSelect = document.getElementById('booking-time');
+                const date = document.getElementById('booking-date')?.value;
+                const room = document.getElementById('booking-room')?.value;
+                if (!date || !room) return;
+                const bookedTimes = bookings.filter(b => b.date === date && b.room === room).map(b => b.time);
+                [...timeSelect.options].forEach(opt => {
+                    if (bookedTimes.includes(opt.value)) {
+                    opt.disabled = true;
+                    opt.style.textDecoration = 'line-through';
+                    opt.style.color = '#999';
+                    } else {
+                    opt.disabled = false;
+                    opt.style.textDecoration = 'none';
+                    opt.style.color = '';
+                    }
+                });
+            }
+
+            window.addEventListener('hashchange', () => render(window.location.hash));
+            render(route);
+            if (!window.location.hash) navigate('#home');
+
+        </script>
+    </body>
 </html>
