@@ -171,46 +171,6 @@
                             <p><a href="#login" onclick="navigate('#login')">Back to Login</a></p>
                         `;
                         break;
-                    case '#dashboard':
-                        const today = new Date().toISOString().split('T')[0];
-                        app.innerHTML = `
-                            <h2>Dashboard</h2>
-                            <p>Welcome to the dashboard.</p>
-                            <button onclick="navigate('#home')">Log out</button>
-                            <h3>Book a Room</h3>
-                            <select id="booking-room" onchange="updateAvailableTimes()">
-                                <option value="Room A101">Room A101</option>
-                                <option value="Room A102">Room A102</option>
-                                <option value="Room B201">Room B201</option>
-                                <option value="Room B202">Room B202</option>
-                                <option value="Room C301">Room C301</option>
-                                <option value="Room C302">Room C302</option>
-                                <option value="Room D401">Room D401</option>
-                                <option value="Room D402">Room D402</option>
-                                <option value="Room E501">Room E501</option>
-                                <option value="Room E502">Room E502</option>
-                            </select>
-                            <input type="date" id="booking-date" min="${today}" onchange="updateAvailableTimes()">
-                            <select id="booking-time">
-                                <option value="08:00">08:00</option>
-                                <option value="09:00">09:00</option>
-                                <option value="10:00">10:00</option>
-                                <option value="11:00">11:00</option>
-                                <option value="12:00">12:00</option>
-                                <option value="13:00">13:00</option>
-                                <option value="14:00">14:00</option>
-                                <option value="15:00">15:00</option>
-                                <option value="16:00">16:00</option>
-                                <option value="17:00">17:00</option>
-                                <option value="18:00">18:00</option>
-                            </select>
-                            
-                            <button onclick="bookRoom()">Book</button>
-                            <div id="bookings-list"></div>
-                        `;
-                        updateAvailableTimes();
-                        showBookings();
-                        break;
                     case '#home':
                         default:
                             app.innerHTML = `
