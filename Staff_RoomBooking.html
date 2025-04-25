@@ -162,14 +162,75 @@
                             <p><a href="#home" onclick="navigate('#home')">Back</a></p>
                         `;
                         break;
-                    case '#forgot':
+                    case '#dashboard':
+                        const today = new Date().toLocaleDateString('en-CA');
                         app.innerHTML = `
-                            <h2>Forgot Password</h2>
-                            <input type="email" id="fp-email" placeholder="Enter your UOW email">
-                            <input type="text" id="fp-key" placeholder="Enter your 10-digit password key">
-                            <button onclick="verifyPasswordKey()">Show Password</button>
-                            <p><a href="#login" onclick="navigate('#login')">Back to Login</a></p>
+                            <h2>UOW Room Booking System (Staff)</h2>
+                            <p>Welcome to UOW Room Booking System.</p>
+                            <button onclick="navigate('#home')">Log out</button>
+                            <h3>Book a Room</h3>
+                            <select id="booking-room" onchange="updateAvailableTimes()">
+                                <option value="Room A101">Room A101</option>
+                                <option value="Room A102">Room A102</option>
+                                <option value="Room B201">Room B201</option>
+                                <option value="Room B202">Room B202</option>
+                                <option value="Room C301">Room C301</option>
+                                <option value="Room C302">Room C302</option>
+                                <option value="Room D401">Room D401</option>
+                                <option value="Room D402">Room D402</option>
+                                <option value="Room E501">Room E501</option>
+                                <option value="Room E502">Room E502</option>
+                            </select>
+                            <input type="date" id="booking-date" min="${today}" onchange="updateAvailableTimes()">
+                            <select id="booking-time">
+                                <option value="08:00">08:00</option>
+                                <option value="09:00">09:00</option>
+                                <option value="10:00">10:00</option>
+                                <option value="11:00">11:00</option>
+                                <option value="12:00">12:00</option>
+                                <option value="13:00">13:00</option>
+                                <option value="14:00">14:00</option>
+                                <option value="15:00">15:00</option>
+                                <option value="16:00">16:00</option>
+                                <option value="17:00">17:00</option>
+                                <option value="18:00">18:00</option>
+                            </select>
+                            
+                            <button onclick="bookRoom()">Book</button>
+                            <div id="bookings-list"></div>
+                            <div id="edit-form" style="display:none">
+                            <h4>Edit Booking</h4>
+                            <select id="edit-room">
+                                <option value="Room A101">Room A101</option>
+                                <option value="Room A102">Room A102</option>
+                                <option value="Room B201">Room B201</option>
+                                <option value="Room B202">Room B202</option>
+                                <option value="Room C301">Room C301</option>
+                                <option value="Room C302">Room C302</option>
+                                <option value="Room D401">Room D401</option>
+                                <option value="Room D402">Room D402</option>
+                                <option value="Room E501">Room E501</option>
+                                <option value="Room E502">Room E502</option>
+                            </select>
+                            <input type="date" id="edit-date" min="${today}">
+                            <select id="edit-time">
+                                <option value="08:00">08:00</option>
+                                <option value="09:00">09:00</option>
+                                <option value="10:00">10:00</option>
+                                <option value="11:00">11:00</option>
+                                <option value="12:00">12:00</option>
+                                <option value="13:00">13:00</option>
+                                <option value="14:00">14:00</option>
+                                <option value="15:00">15:00</option>
+                                <option value="16:00">16:00</option>
+                                <option value="17:00">17:00</option>
+                                <option value="18:00">18:00</option>
+                            </select>
+                            <button onclick="applyEdit()">Apply Changes</button>
+                            </div>
                         `;
+                        updateAvailableTimes();
+                        showBookings();
                         break;
                     case '#home':
                         default:
@@ -184,6 +245,30 @@
             window.addEventListener('hashchange', () => render(window.location.hash));
             render(route);
             if (!window.location.hash) navigate('#home');
+
+            function signup() {
+                const firstName = document.getElementById('firstName').value.trim();
+                const lastName = document.getElementById('lastName').value.trim();
+                const nationality = document.getElementById('nationality').value.trim();
+                const dob = document.getElementById('dob').value;
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const confirm = document.getElementById('confirm').value;
+                if (password !== confirm) return alert('Passwords do not match.');
+                users.push({ name: firstName + ' ' + lastName, email, password, nationality, dob });
+                alert(`Sign up successful.`);
+                navigate('#login');
+            }
+
+            function login() {
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const user = users.find(u => u.email === email && u.password === password);
+                if (user) {
+                    alert(`Welcome ${user.name}!`);
+                    navigate('#dashboard');
+                } else alert('Invalid email or password.');
+            }
 
         </script>
     </body>
