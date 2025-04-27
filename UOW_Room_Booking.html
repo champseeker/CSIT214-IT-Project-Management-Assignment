@@ -85,8 +85,15 @@
             let additionalCharge = 0;
             const users = []; 
             const staffUsers = []; 
-            const bookings = []; 
-            const rooms = []; 
+            let bookings = []; 
+            let rooms = []; 
+
+            // --------------------------------------------------------------------------For Testing Only--------------------------------------------------------------------------
+            staffUsers.push({ name: 'John Tan', email: 'group1@uowmail.edu.au', password: 'QWer1234%', nationality: 'Singaporean', dob: '04/27/2025', passwordKey: 1000000001 });
+            users.push({ name: 'Sam Low', email: 'group2@uowmail.edu.au', password: 'QWer1234%', nationality: 'Singaporean', dob: '04/27/2025', passwordKey: 1000000002 });
+            rooms.push({ name: 'A1.17', capacity: '250', price: '1', promo: 'Test', active: true });
+            bookings.push({ date: '04/27/2025', time: '14:00', room: 'A1.17' });
+            // --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
             function navigate(route) {
                 window.location.hash = route;
@@ -392,20 +399,23 @@
 
                 document.getElementById('modify-date').value = booking.date;
                 document.getElementById('modify-time').value = booking.time;
-                modifyRoomSelect.value = booking.room;  // Set the current room selected
+                modifyRoomSelect.value = booking.room;
                 modifyingIndex = index;
             }
 
             function showBookings() {
                 const list = document.getElementById('bookings-list');
-                list.innerHTML = '<h4>Current Bookings:</h4>' + bookings.map((b, i) => `
-                    <p>${b.date} @ ${b.time} - ${b.room}
-                        <span class="booking-controls">
-                        <button onclick="modifyBooking(${i})">Modify</button>
-                        <button onclick="deleteBooking(${i})">Delete</button>
-                        </span>
-                    </p>
-                `).join('');
+                list.innerHTML = '<h4>Current Bookings:</h4>' + bookings.map((b, i) => {
+                    const room = rooms.find(r => r.name === b.room);
+                    const status = room && room.active ? '' : 'Room is inactive - ';
+                    return `
+                        <p>${status}${b.date} @ ${b.time} - ${b.room}
+                            <span class="booking-controls">
+                            <button onclick="modifyBooking(${i})">Modify</button>
+                            <button onclick="deleteBooking(${i})">Delete</button>
+                            </span>
+                        </p>`
+                }).join('');
             }
 
             function updateAvailableTimes() {
@@ -635,8 +645,10 @@
 
             function deleteRoom(index) {
                 if (confirm('Are you sure you want to delete this room?')) {
+                    const roomToDelete = rooms[index];
                     rooms.splice(index, 1);
-                    showRooms();
+                    bookings = bookings.filter(booking => booking.room !== roomToDelete.name);
+                    showRooms(); 
                 }
             }
 
