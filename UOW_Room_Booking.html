@@ -99,8 +99,8 @@
                     default:
                         app.innerHTML = `
                             <h1>UOW Room Booking System</h1>
-                            <button onclick="navigate('#student-home')" style="width: 200px;">Student Portal</button><br>
-                            <button onclick="navigate('#staff-home')" style="width: 200px;">Staff Portal</button>
+                            <button onclick="navigate('#staff-home')" style="width: 200px;">Staff Portal</button><br>
+                            <button onclick="navigate('#student-home')" style="width: 200px;">Student Portal</button>
                         `;
                         break;
 
@@ -480,10 +480,16 @@
             }
 
             function createRoom() {
-                const name = document.getElementById('new-room-name').value.trim();
-                const capacity = parseInt(document.getElementById('new-room-capacity').value.trim());
-                const price = parseFloat(document.getElementById('new-room-price').value.trim());
-                const promo = document.getElementById('new-room-promo').value.trim();
+
+                const nameUI = document.getElementById('new-room-name');
+                const capacityUI = document.getElementById('new-room-capacity');
+                const priceUI = document.getElementById('new-room-price');
+                const promoUI = document.getElementById('new-room-promo');
+
+                const name = nameUI.value.trim();
+                const capacity = parseInt(capacityUI.value.trim());
+                const price = parseFloat(priceUI.value.trim());
+                const promo = promoUI.value.trim();
 
                 if (!name || isNaN(capacity) || isNaN(price)) {
                     return alert('Please fill all required fields.');
@@ -503,6 +509,10 @@
                 });
 
                 alert('Room created. Activate it to make it available.');
+                nameUI.value = '';
+                capacityUI.value = '';
+                priceUI.value = '';
+                promoUI.value = '';
                 showRooms();
             }
 
