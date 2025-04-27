@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>UOW Room Booking System</title>
+
+        <style>
+
+            body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            background-color: #f0f4f8;
+            }
+
+            .container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            h1, h2 {
+            color: #000000;
+            }
+
+            input, button, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            }
+
+            button {
+            background-color: #3b82f6;
+            color: white;
+            cursor: pointer;
+            }
+
+            button:hover {
+            background-color: #2563eb;
+            }
+
+            a {
+            color: #3b82f6;
+            text-decoration: underline;
+            }
+
+            .logo {
+            width: 140px;
+            margin-bottom: 20px;
+            }
+
+            .booking-controls button {
+            width: auto;
+            margin: 0 5px;
+            }
+
+            #modify-form {
+            background: #e5f0ff;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 20px;
+            }
+
+        </style>
+
+    </head>
+    <body>
+        <div class="container">
+            <img src="https://cef.org.au/wp-content/uploads/2021/10/UoW-logo.png" alt="UOW Logo" class="logo">
+            <div id="app"></div>
+        </div>
+
+        <script>
+
+            const app = document.getElementById('app');
+            let route = window.location.hash;
+            let pendingBooking = null;
+            let additionalCharge = 0;
+            const users = []; 
+            const staffUsers = []; 
+            const bookings = []; 
+            const rooms = []; 
+
+            function navigate(route) {
+                window.location.hash = route;
+                render(route);
+            }
+
+            function render(route) {
+                switch (route) {
+                    case '#home':
+                    default:
+                        app.innerHTML = `
+                            <h1>UOW Room Booking System</h1>
+                            <button onclick="navigate('#student-home')" style="width: 200px;">Student Portal</button><br>
+                            <button onclick="navigate('#staff-home')" style="width: 200px;">Staff Portal</button>
+                        `;
+                        break;
+
+                    case '#student-home':
+                        app.innerHTML = `
+                            <h2>Student Portal</h2>
+                            <button onclick="navigate('#student-login')" style="width: 200px;">Login</button><br>
+                            <button onclick="navigate('#student-signup')" style="width: 200px;">Sign Up</button><br><br>
+                            <a href="#home" onclick="navigate('#home')">Back</a>
+                        `;
+                        break;
+
+                    case '#staff-home':
+                        app.innerHTML = `
+                            <h2>Staff Portal</h2>
+                            <button onclick="navigate('#staff-login')" style="width: 200px;">Login</button><br>
+                            <button onclick="navigate('#staff-signup')" style="width: 200px;">Sign Up</button><br><br>
+                            <a href="#home" onclick="navigate('#home')">Back</a>
+                        `;
+                        break;
+
+                    case '#student-signup':
+                        app.innerHTML = `
+                            <h2>Student Sign Up</h2>
+                            <input type="text" id="firstName" placeholder="First Name">
+                            <input type="text" id="lastName" placeholder="Last Name">
+                            <input type="email" id="email" placeholder="UOW Student Email">
+                            <input type="password" id="password" placeholder="Password">
+                            <input type="password" id="confirm" placeholder="Confirm Password">
+                            <input list="nationalities" id="nationality" placeholder="Nationality">
+                            <datalist id="nationalities">
+                                <option value="Afghan"> <option value="Albanian"> <option value="Algerian"> <option value="American"> <option value="Andorran">
+                                <option value="Angolan"> <option value="Argentine"> <option value="Armenian"> <option value="Australian"> <option value="Austrian">
+                                <option value="Azerbaijani"> <option value="Bangladeshi"> <option value="Belgian"> <option value="Brazilian">
+                                <option value="British"> <option value="Canadian"> <option value="Chinese"> <option value="Colombian"> <option value="Croatian">
+                                <option value="Czech"> <option value="Danish"> <option value="Dutch"> <option value="Egyptian"> <option value="English">
+                                <option value="Finnish"> <option value="French"> <option value="German"> <option value="Greek"> <option value="Hungarian">
+                                <option value="Indian"> <option value="Indonesian"> <option value="Irish"> <option value="Israeli"> <option value="Italian">
+                                <option value="Japanese"> <option value="Kenyan"> <option value="Malaysian"> <option value="Mexican"> <option value="Nepalese">
+                                <option value="New Zealander"> <option value="Nigerian"> <option value="Norwegian"> <option value="Pakistani">
+                                <option value="Peruvian"> <option value="Philippine"> <option value="Polish"> <option value="Portuguese">
+                                <option value="Romanian"> <option value="Russian"> <option value="Saudi"> <option value="Scottish"> <option value="Singaporean">
+                                <option value="South African"> <option value="South Korean"> <option value="Spanish"> <option value="Sri Lankan">
+                                <option value="Swedish"> <option value="Swiss"> <option value="Taiwanese"> <option value="Thai"> <option value="Turkish">
+                                <option value="Ukrainian"> <option value="Vietnamese"> <option value="Welsh"> <option value="Zimbabwean"> <option value="Other">
+                                </datalist>    
+                            <label for="dob" style="display:block; text-align:left; font-size:14px;">Date of Birth</label>
+                            <input type="date" id="dob">
+                            <button onclick="studentSignup()">Sign Up</button>
+                            <p><a href="#student-home" onclick="navigate('#student-home')">Back</a></p>
+                        `;
+                        break;
+
+                    case '#student-login':
+                        app.innerHTML = `
+                            <h2>Student Login</h2>
+                            <input type="email" id="email" placeholder="Email">
+                            <input type="password" id="password" placeholder="Password">
+                            <button onclick="studentLogin()">Login</button>
+                            <p><a href="#student-forgot" onclick="navigate('#student-forgot')">Forgot Password?</a></p>
+                            <p><a href="#student-home" onclick="navigate('#student-home')">Back</a></p>
+                        `;
+                        break;
+
+                    case '#student-forgot':
+                        app.innerHTML = `
+                            <h2>Student Forgot Password</h2>
+                            <input type="email" id="fp-email" placeholder="Enter your UOW email">
+                            <input type="text" id="fp-key" placeholder="Enter your 10-digit password key">
+                            <button onclick="studentVerifyPasswordKey()">Show Password</button>
+                            <p><a href="#student-login" onclick="navigate('#student-login')">Back to Login</a></p>
+                        `;
+                        break;
+
+                    case '#staff-signup':
+                        app.innerHTML = `
+                            <h2>Staff Sign Up</h2>
+                            <input type="text" id="firstName" placeholder="First Name">
+                            <input type="text" id="lastName" placeholder="Last Name">
+                            <input type="email" id="email" placeholder="UOW Staff Email">
+                            <input type="password" id="password" placeholder="Password">
+                            <input type="password" id="confirm" placeholder="Confirm Password">
+                            <input list="nationalities" id="nationality" placeholder="Nationality">
+                            <datalist id="nationalities">
+                                <option value="Afghan"> <option value="Albanian"> <option value="Algerian"> <option value="American"> <option value="Andorran">
+                                <option value="Angolan"> <option value="Argentine"> <option value="Armenian"> <option value="Australian"> <option value="Austrian">
+                                <option value="Azerbaijani"> <option value="Bangladeshi"> <option value="Belgian"> <option value="Brazilian">
+                                <option value="British"> <option value="Canadian"> <option value="Chinese"> <option value="Colombian"> <option value="Croatian">
+                                <option value="Czech"> <option value="Danish"> <option value="Dutch"> <option value="Egyptian"> <option value="English">
+                                <option value="Finnish"> <option value="French"> <option value="German"> <option value="Greek"> <option value="Hungarian">
+                                <option value="Indian"> <option value="Indonesian"> <option value="Irish"> <option value="Israeli"> <option value="Italian">
+                                <option value="Japanese"> <option value="Kenyan"> <option value="Malaysian"> <option value="Mexican"> <option value="Nepalese">
+                                <option value="New Zealander"> <option value="Nigerian"> <option value="Norwegian"> <option value="Pakistani">
+                                <option value="Peruvian"> <option value="Philippine"> <option value="Polish"> <option value="Portuguese">
+                                <option value="Romanian"> <option value="Russian"> <option value="Saudi"> <option value="Scottish"> <option value="Singaporean">
+                                <option value="South African"> <option value="South Korean"> <option value="Spanish"> <option value="Sri Lankan">
+                                <option value="Swedish"> <option value="Swiss"> <option value="Taiwanese"> <option value="Thai"> <option value="Turkish">
+                                <option value="Ukrainian"> <option value="Vietnamese"> <option value="Welsh"> <option value="Zimbabwean"> <option value="Other">
+                                </datalist>    
+                            <label for="dob" style="display:block; text-align:left; font-size:14px;">Date of Birth</label>
+                            <input type="date" id="dob">
+                            <button onclick="staffSignup()">Sign Up</button>
+                            <p><a href="#staff-home" onclick="navigate('#staff-home')">Back</a></p>
+                        `;
+                        break;
+
+                    case '#staff-login':
+                        app.innerHTML = `
+                            <h2>Staff Login</h2>
+                            <input type="email" id="email" placeholder="Email">
+                            <input type="password" id="password" placeholder="Password">
+                            <button onclick="staffLogin()">Login</button>
+                            <p><a href="#staff-forgot" onclick="navigate('#staff-forgot')">Forgot Password?</a></p>
+                            <p><a href="#staff-home" onclick="navigate('#staff-home')">Back</a></p>
+                        `;
+                        break;
+
+                    case '#staff-forgot':
+                        app.innerHTML = `
+                            <h2>Staff Forgot Password</h2>
+                            <input type="email" id="fp-email" placeholder="Enter your UOW email">
+                            <input type="text" id="fp-key" placeholder="Enter your 10-digit password key">
+                            <button onclick="staffVerifyPasswordKey()">Show Password</button>
+                            <p><a href="#staff-login" onclick="navigate('#staff-login')">Back to Login</a></p>
+                        `;
+                        break;
+
+                    case '#student-dashboard':
+                        const today = new Date().toLocaleDateString('en-CA');
+                        app.innerHTML = `
+                            <h2>Student Dashboard</h2>
+                            <p>Welcome Student!</p>
+                            <button onclick="navigate('#home')">Logout</button>
+
+                            <h3>Book a Room</h3>
+                            <select id="booking-room" onchange="updateAvailableTimes()">
+                            ${
+                                rooms.filter(r => r.active)
+                                .map(r => `<option value="${r.name}">${r.name} ($${r.price})</option>`)
+                                .join('')
+                            }
+                            </select>
+                            <input type="date" id="booking-date" min="${today}" onchange="updateAvailableTimes()">
+                            <select id="booking-time">
+                            <option value="08:00">08:00</option>
+                            <option value="09:00">09:00</option>
+                            <option value="10:00">10:00</option>
+                            <option value="11:00">11:00</option>
+                            <option value="12:00">12:00</option>
+                            <option value="13:00">13:00</option>
+                            <option value="14:00">14:00</option>
+                            <option value="15:00">15:00</option>
+                            <option value="16:00">16:00</option>
+                            <option value="17:00">17:00</option>
+                            <option value="18:00">18:00</option>
+                            </select>
+                            <button onclick="startBooking()">Proceed to Payment</button>
+
+                            <div id="bookings-list"></div>
+
+                            <div id="modify-form" style="display:none">
+                            <h4>Modify Booking</h4>
+                            <select id="modify-room">
+                                    
+                            </select>
+                            <input type="date" id="modify-date" min="${today}">
+                            <select id="modify-time">
+                            <option value="08:00">08:00</option>
+                            <option value="09:00">09:00</option>
+                            <option value="10:00">10:00</option>
+                            <option value="11:00">11:00</option>
+                            <option value="12:00">12:00</option>
+                            <option value="13:00">13:00</option>
+                            <option value="14:00">14:00</option>
+                            <option value="15:00">15:00</option>
+                            <option value="16:00">16:00</option>
+                            <option value="17:00">17:00</option>
+                            <option value="18:00">18:00</option>
+                            </select>
+                            <button onclick="applyModify()">Apply Changes</button>
+                            </div>
+                            
+                        `;
+                        updateAvailableTimes();
+                        showBookings();
+                        break;
+
+                    case '#staff-dashboard':
+                        app.innerHTML = `
+                            <h2>Staff Room Management</h2>
+                            <button onclick="navigate('#home')">Logout</button>
+
+                            <h3>Create New Room</h3>
+                            <input type="text" id="new-room-name" placeholder="Room Name">
+                            <input type="number" id="new-room-capacity" placeholder="Capacity">
+                            <input type="number" id="new-room-price" placeholder="Price per Booking ($)">
+                            <input type="text" id="new-room-promo" placeholder="Promotion Code (optional)">
+                            <button onclick="createRoom()">Add Room</button>
+
+                            <h3>Manage Existing Rooms</h3>
+                            <div id="room-list"></div>
+                        `;
+                        showRooms();
+                        break;
+                }
+            }
+
+            function studentSignup() {
+                const firstName = document.getElementById('firstName').value.trim();
+                const lastName = document.getElementById('lastName').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const confirm = document.getElementById('confirm').value;
+                const nationality = document.getElementById('nationality').value.trim();
+                const dob = document.getElementById('dob').value;
+                const emailRegex = /^[\w-.]+@uowmail\.edu\.au$/;
+                const passRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+
+                if (!emailRegex.test(email)) return alert('Please use a valid UOW student email.');
+                if (!passRegex.test(password)) return alert('Password must have uppercase, number, special character and 8+ characters.');
+                if (password !== confirm) return alert('Passwords do not match.');
+                if (staffUsers.some(u => u.email === email)) {
+                    return alert('This email is already registered as a staff account.');
+                }
+
+                const passwordKey = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+                users.push({ name: firstName + ' ' + lastName, email, password, nationality, dob, passwordKey });
+                alert(`Signup successful!\nPassword key: ${passwordKey}`);
+                navigate('#student-login');
+            }
+
+            function studentLogin() {
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const user = users.find(u => u.email === email && u.password === password);
+
+                if (user) {
+                    alert(`Welcome ${user.name}!`);
+                    navigate('#student-dashboard');
+                } else {
+                    alert('Invalid login.');
+                }
+            }
+
+            function studentVerifyPasswordKey() {
+                const email = document.getElementById('fp-email').value.trim();
+                const key = document.getElementById('fp-key').value.trim();
+                const user = users.find(u => u.email === email && u.passwordKey === key);
+
+                if (user) {
+                    alert(`Your password is: ${user.password}`);
+                    navigate('#student-login');
+                } else {
+                    alert('Invalid password key or email.');
+                }
+            }
+
+            function bookRoom() {
+                const date = document.getElementById('booking-date').value;
+                const time = document.getElementById('booking-time').value;
+                const room = document.getElementById('booking-room').value;
+
+                if (!date || !time || !room) return alert('Please complete all booking fields.');
+                const conflict = bookings.find(b => b.date === date && b.time === time && b.room === room);
+                if (conflict) return alert('This time slot is already booked.');
+
+                bookings.push({ date, time, room });
+                alert(`Room booked: ${room} on ${date} at ${time}`);
+                updateAvailableTimes();
+                showBookings();
+            }
+
+            function deleteBooking(index) {
+                if (confirm('Are you sure you want to delete this booking?')) {
+                    bookings.splice(index, 1);
+                    updateAvailableTimes();
+                    showBookings();
+                }
+            }
+
+            function modifyBooking(index) {
+                const booking = bookings[index];
+                document.getElementById('modify-form').style.display = 'block';
+
+                const modifyRoomSelect = document.getElementById('modify-room');
+                modifyRoomSelect.innerHTML = rooms.filter(r => r.active)
+                    .map(r => `<option value="${r.name}">${r.name} ($${r.price})</option>`)
+                    .join('');
+
+                document.getElementById('modify-date').value = booking.date;
+                document.getElementById('modify-time').value = booking.time;
+                modifyRoomSelect.value = booking.room;  // Set the current room selected
+                modifyingIndex = index;
+            }
+
+            function showBookings() {
+                const list = document.getElementById('bookings-list');
+                list.innerHTML = '<h4>Current Bookings:</h4>' + bookings.map((b, i) => `
+                    <p>${b.date} @ ${b.time} - ${b.room}
+                        <span class="booking-controls">
+                        <button onclick="modifyBooking(${i})">Modify</button>
+                        <button onclick="deleteBooking(${i})">Delete</button>
+                        </span>
+                    </p>
+                `).join('');
+            }
+
+            function updateAvailableTimes() {
+                const timeSelect = document.getElementById('booking-time');
+                const date = document.getElementById('booking-date')?.value;
+                const room = document.getElementById('booking-room')?.value;
+
+                if (!date || !room) return;
+
+                const bookedTimes = bookings.filter(b => b.date === date && b.room === room).map(b => b.time);
+                [...timeSelect.options].forEach(opt => {
+                    if (bookedTimes.includes(opt.value)) {
+                    opt.disabled = true;
+                    opt.style.textDecoration = 'line-through';
+                    opt.style.color = '#999';
+                    } else {
+                    opt.disabled = false;
+                    opt.style.textDecoration = 'none';
+                    opt.style.color = '';
+                    }
+                });
+            }
+
+            function staffSignup() {
+                const firstName = document.getElementById('firstName').value.trim();
+                const lastName = document.getElementById('lastName').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const confirm = document.getElementById('confirm').value;
+                const nationality = document.getElementById('nationality').value.trim();
+                const dob = document.getElementById('dob').value;
+                const emailRegex = /^[\w-.]+@(uowmail\.edu\.au|uow\.edu\.au)$/;
+                const passRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+
+                if (!emailRegex.test(email)) return alert('Please use a valid UOW staff email.');
+                if (!passRegex.test(password)) return alert('Password must have uppercase, number, special character and 8+ characters.');
+                if (password !== confirm) return alert('Passwords do not match.');
+                if (users.some(u => u.email === email)) {
+                    return alert('This email is already registered as a student account.');
+                }
+
+                const passwordKey = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+                staffUsers.push({ name: firstName + ' ' + lastName, email, password, nationality, dob, passwordKey });
+                alert(`Staff signup successful!\nPassword key: ${passwordKey}`);
+                navigate('#staff-login');
+            }
+
+            function staffLogin() {
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const staff = staffUsers.find(u => u.email === email && u.password === password);
+
+                if (staff) {
+                    alert(`Welcome Staff ${staff.name}!`);
+                    navigate('#staff-dashboard');
+                } else {
+                    alert('Invalid staff login.');
+                }
+            }
+
+            function staffVerifyPasswordKey() {
+                const email = document.getElementById('fp-email').value.trim();
+                const key = document.getElementById('fp-key').value.trim();
+                const staff = staffUsers.find(u => u.email === email && u.passwordKey === key);
+
+                if (staff) {
+                    alert(`Your password is: ${staff.password}`);
+                    navigate('#staff-login');
+                } else {
+                    alert('Invalid password key or email.');
+                }
+            }
+
+            function createRoom() {
+                const name = document.getElementById('new-room-name').value.trim();
+                const capacity = parseInt(document.getElementById('new-room-capacity').value.trim());
+                const price = parseFloat(document.getElementById('new-room-price').value.trim());
+                const promo = document.getElementById('new-room-promo').value.trim();
+
+                if (!name || isNaN(capacity) || isNaN(price)) {
+                    return alert('Please fill all required fields.');
+                }
+
+                const existingRoom = rooms.find(r => r.name.toLowerCase() === name.toLowerCase());
+                if (existingRoom) {
+                    return alert(`'${existingRoom.name}' already exists. Please choose another room name.`);
+                }
+
+                rooms.push({
+                    name,
+                    capacity,
+                    price,
+                    promo,
+                    active: false
+                });
+
+                alert('Room created. Activate it to make it available.');
+                showRooms();
+            }
+
+            function showRooms() {
+                const list = document.getElementById('room-list');
+                if (!list) return;
+
+                list.innerHTML = rooms.map((room, index) => `
+                    <div style="border:1px solid #ccc; margin:10px; padding:10px; border-radius:6px;">
+                    <strong>${room.name}</strong><br>
+                    Capacity: ${room.capacity}<br>
+                    Price: $${room.price}<br>
+                    Promo: ${room.promo || 'None'}<br>
+                    Status: ${room.active ? '<span style="color:green;">Active</span>' : '<span style="color:red;">Inactive</span>'}<br><br>
+
+                    <button onclick="activateRoom(${index})">${room.active ? 'Deactivate' : 'Activate'}</button>
+                    <button onclick="deleteRoom(${index})" style="color:red;">Delete</button>
+                    </div>
+                `).join('');
+            }
+
+            function startBooking() {
+                const date = document.getElementById('booking-date').value;
+                const time = document.getElementById('booking-time').value;
+                const room = document.getElementById('booking-room').value;
+
+                if (!date || !time || !room) return alert('Please complete all booking fields.');
+                const conflict = bookings.find(b => b.date === date && b.time === time && b.room === room);
+                if (conflict) return alert('This time slot is already booked.');
+
+                pendingBooking = { date, time, room };
+
+                app.innerHTML = `
+                    <h2>Payment</h2>
+                    <p>Room: ${room}</p>
+                    <p>Date: ${date}</p>
+                    <p>Time: ${time}</p>
+                    <button onclick="completePayment()">Pay Now</button>
+                    <p><a href="#student-dashboard" onclick="navigate('#student-dashboard')">Cancel</a></p>
+                `;
+            }
+
+            function completePayment() {
+                if (!pendingBooking) return alert('No pending booking.');
+
+                bookings.push(pendingBooking);
+                pendingBooking = null;
+                alert('Payment Successful! Room booked.');
+
+                navigate('#student-dashboard');
+            }
+
+            function applyModify() {
+                const date = document.getElementById('modify-date').value;
+                const time = document.getElementById('modify-time').value;
+                const room = document.getElementById('modify-room').value;
+
+                if (!date || !time || !room) return alert('Please complete all fields.');
+
+                const conflict = bookings.find((b, i) => b.date === date && b.time === time && b.room === room && i !== modifyingIndex);
+                if (conflict) return alert('Time slot already booked.');
+
+                const oldBooking = bookings[modifyingIndex];
+                const oldRoom = rooms.find(r => r.name === oldBooking.room);
+                const newRoom = rooms.find(r => r.name === room);
+
+                if (!oldRoom || !newRoom) {
+                    return alert('Error finding room information.');
+                }
+
+                const oldPrice = oldRoom.price;
+                const newPrice = newRoom.price;
+
+                if (newPrice > oldPrice) {
+                    additionalCharge = (newPrice - oldPrice).toFixed(2);
+                    pendingModifyBooking = { date, time, room };
+                    goToModifyPayment();
+                    return; 
+                } else if (newPrice < oldPrice) {
+                    const refund = (oldPrice - newPrice).toFixed(2);
+                    alert(`The new room is cheaper! $${refund} will be refunded.`);
+                } else {
+                    alert('No price difference.');
+                }
+
+                bookings[modifyingIndex] = { date, time, room };
+                modifyingIndex = -1;
+                document.getElementById('modify-form').style.display = 'none';
+                alert('Booking updated successfully!');
+                updateAvailableTimes();
+                showBookings();
+            }
+
+            function goToModifyPayment() {
+                app.innerHTML = `
+                    <h2>Payment for Booking Modification</h2>
+                    <p>Additional Amount: $${additionalCharge}</p>
+                    <button onclick="completeModifyPayment()">Pay Now</button>
+                    <p><a href="#student-dashboard" onclick="navigate('#student-dashboard')">Cancel</a></p>
+                `;
+            }
+
+            function completeModifyPayment() {
+                if (!pendingModifyBooking) {
+                    alert('No pending modification.');
+                    return;
+                }
+                bookings[modifyingIndex] = pendingModifyBooking;
+                modifyingIndex = -1;
+                pendingModifyBooking = null;
+                additionalCharge = 0;
+                alert('Payment successful! Booking modified.');
+                navigate('#student-dashboard');
+            }
+
+            function activateRoom(index) {
+                rooms[index].active = !rooms[index].active;
+                showRooms();
+            }
+
+            function deleteRoom(index) {
+                if (confirm('Are you sure you want to delete this room?')) {
+                    rooms.splice(index, 1);
+                    showRooms();
+                }
+            }
+
+            window.addEventListener('hashchange', () => render(window.location.hash));
+            render(route);
+            if (!window.location.hash) navigate('#home');
+
+        </script>
+    </body>
+</html>
