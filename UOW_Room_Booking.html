@@ -83,16 +83,23 @@
             let route = window.location.hash;
             let pendingBooking = null;
             let additionalCharge = 0;
-            const users = []; 
-            const staffUsers = []; 
-            let bookings = []; 
-            let rooms = []; 
+            const users = [];
+            const staffUsers = [];
+            let bookings = [];
+            let rooms = [];
+            const today = new Date().toLocaleDateString('en-CA');
 
             // --------------------------------------------------------------------------For Testing Only--------------------------------------------------------------------------
             // staffUsers.push({ name: 'John Tan', email: 'group1@uowmail.edu.au', password: 'QWer1234%', nationality: 'Singaporean', dob: '04/27/2025', passwordKey: 1000000001 });
             // users.push({ name: 'Sam Low', email: 'group2@uowmail.edu.au', password: 'QWer1234%', nationality: 'Singaporean', dob: '04/27/2025', passwordKey: 1000000002 });
             // rooms.push({ name: 'A1.17', capacity: '250', price: '1', promo: 'Test', active: true });
-            // bookings.push({ date: '04/27/2025', time: '14:00', room: 'A1.17' });
+            // rooms.push({ name: 'A1.15', capacity: '250', price: '25', promo: 'Test', active: true });
+            // rooms.push({ name: 'A1.09a', capacity: '250', price: '1', promo: 'Test', active: false });
+            // rooms.push({ name: 'A1.09b', capacity: '250', price: '25', promo: 'Test', active: false });
+            // bookings.push({ date: today, time: '14:00', room: 'A1.17' });
+            // bookings.push({ date: today, time: '08:00', room: 'A1.15' });
+            // bookings.push({ date: today, time: '12:00', room: 'A1.09a' });
+            // bookings.push({ date: today, time: '10:00', room: 'A1.09b' });
             // --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
             function navigate(route) {
@@ -154,7 +161,7 @@
                                 <option value="Swedish"> <option value="Swiss"> <option value="Taiwanese"> <option value="Thai"> <option value="Turkish">
                                 <option value="Ukrainian"> <option value="Vietnamese"> <option value="Welsh"> <option value="Zimbabwean"> <option value="Other">
                                 </datalist>    
-                            <label for="dob" style="display:block; text-align:left; font-size:14px;">Date of Birth</label>
+                            <label for="dob" max="${today}" style="display:block; text-align:left; font-size:14px;">Date of Birth</label>
                             <input type="date" id="dob">
                             <button onclick="studentSignup()">Sign Up</button>
                             <p><a href="#student-home" onclick="navigate('#student-home')">Back</a></p>
@@ -207,7 +214,7 @@
                                 <option value="Swedish"> <option value="Swiss"> <option value="Taiwanese"> <option value="Thai"> <option value="Turkish">
                                 <option value="Ukrainian"> <option value="Vietnamese"> <option value="Welsh"> <option value="Zimbabwean"> <option value="Other">
                                 </datalist>    
-                            <label for="dob" style="display:block; text-align:left; font-size:14px;">Date of Birth</label>
+                            <label for="dob" max="${today}" style="display:block; text-align:left; font-size:14px;">Date of Birth</label>
                             <input type="date" id="dob">
                             <button onclick="staffSignup()">Sign Up</button>
                             <p><a href="#staff-home" onclick="navigate('#staff-home')">Back</a></p>
@@ -236,7 +243,6 @@
                         break;
 
                     case '#student-dashboard':
-                        const today = new Date().toLocaleDateString('en-CA');
                         app.innerHTML = `
                             <h2>Student Dashboard</h2>
                             <p>Welcome Student!</p>
@@ -393,9 +399,9 @@
                 document.getElementById('modify-form').style.display = 'block';
 
                 const modifyRoomSelect = document.getElementById('modify-room');
-                modifyRoomSelect.innerHTML = rooms.filter(r => r.active)
-                    .map(r => `<option value="${r.name}">${r.name} ($${r.price})</option>`)
-                    .join('');
+                modifyRoomSelect.innerHTML = rooms.map(
+                    r => `<option value="${r.name}"${r.active ? '' : ' disabled'}>${r.name} ($${r.price})${r.active ? '' : ' (inactive)'}</option>`
+                ).join('');
 
                 document.getElementById('modify-date').value = booking.date;
                 document.getElementById('modify-time').value = booking.time;
